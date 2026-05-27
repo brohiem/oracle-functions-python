@@ -4,16 +4,18 @@ import logging
 
 from fdk import response
 
+logger = logging.getLogger(__name__)
+
 
 def handler(ctx, data: io.BytesIO = None):
-    name = "World 3"
+    name = "World"
     try:
         body = json.loads(data.getvalue())
-        name = body.get("name")
-    except (Exception, ValueError) as ex:
-        logging.getLogger().info('error parsing json payload: ' + str(ex))
+        name = body.get("name", name)
+    except (json.JSONDecodeError, ValueError) as ex:
+        logger.warning('error parsing json payload: %s', ex)
 
-    logging.getLogger().info("Inside Python Hello World function")
+    logger.info("Inside Python Hello World function")
     return response.Response(
         ctx, response_data=json.dumps(
             {"message": "Hello {0}".format(name)}),
